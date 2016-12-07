@@ -1,0 +1,89 @@
+﻿@using SUCRMS.Models
+@model SUCRMS.Models.Course
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<ClassSchedule> classSchedules = ViewBag.ClassScheduleList;
+}
+
+<section class="content-header">
+    <h1>
+        View Class Schedule
+        <small>View</small>
+    </h1>
+
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box box-primary col-sm-12">
+                <div class="box-header with-border">
+                    <div class="col-sm-6">
+                        <h3 class="box-title" style="">View Class Schedule and Room Allocation </h3>
+                    </div>
+                    <div class="col-sm-6">
+                        <form class="form-horizontal" action="Index" method="POST">
+                            <div class="form-group">
+                                @Html.LabelFor(a => a.DepartmentId, new { @class = "col-sm-3 control-label" })
+                                <div class="col-sm-9">
+                                    @Html.DropDownListFor(a => a.DepartmentId, new SelectList(ViewBag.Department, "Id", "Code"), "Select a Department", new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.DepartmentId)
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <table border="1" class="table table-bordered table-condensed" id="view">
+                        <thead>
+                            <tr>
+                                <th>Course Code</th>
+                                <th>Name</th>
+                                <th>Scheduled info</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (classSchedules != null)
+                                {
+
+                                    foreach (ClassSchedule classSchedule in classSchedules)
+                                    {
+                                        <tr>
+                                            <td>@classSchedule.CourseCode</td>
+                                            <td>@classSchedule.CourseName</td>
+                                            @if (classSchedule.RoomNo == "")
+                                            {
+                                                <td>Not Scheduled Yet</td>
+                                            }
+                                            else
+                                            {
+                                                <td>Room No: @classSchedule.RoomNo, @classSchedule.Day, @classSchedule.TimeFrom - @classSchedule.TimeTo</td>
+                                            }
+                                        </tr>
+
+                                    }
+                                }
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+<script src="~/Scripts/DataTables/responsive.bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $('#view').DataTable();
+
+        $("#DepartmentId").change(function () {
+            this.form.submit();
+        });
+
+    });
+</script>
+

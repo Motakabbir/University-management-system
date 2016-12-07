@@ -1,0 +1,165 @@
+﻿@using SUCRMS.Models
+@model SUCRMS.Models.AllocateClassroom
+@{
+    ViewBag.Title = "Save";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Allocate Classrooms
+        <small>Save</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Allocate Classrooms</a></li>
+        <li class="active">Save</li>
+    </ol>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box box-primary col-sm-12">
+                <div class="col-sm-8 col-sm-offset-2">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Allocate Classrooms</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    @using (Html.BeginForm("Save", "AllocateClassroom", FormMethod.Post, new { @class = "form-horizontal", @id = "AllocateClassroom" }))
+                    {
+
+                        if (ViewBag.Message != null)
+                        {
+                            if (ViewBag.Message == "Saved")
+                            {
+                                <div class="col-sm-12"></div>
+                                <div class="alert alert-success" id="success-alert">
+                                    <button type="button" class="close" data-dismiss="alert">x</button>
+                                    <strong>Successfully Saved! </strong>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-sm-12">
+                                    <div class="alert alert-error" id="success-alert">
+                                        <button type="button" class="close" data-dismiss="alert">x</button>
+                                        <strong>Save Faild! </strong>
+                                        <p>@ViewBag.Message</p>
+                                    </div>
+                                </div>
+                            }
+
+                        }
+                        @Html.ValidationSummary(true)
+                        <div class="box-body">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(a => a.DepartmentId)
+                                    @Html.DropDownListFor(a => a.DepartmentId, new SelectList(ViewBag.Department, "Id", "Code"),"Select a Department", new { @class = "form-control input-sm" })
+                                </div>
+                                
+                                <!-- /.box-body -->
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="CourseId">Course </label>
+                                    <select class="form-control input-sm" name="CourseId" id="CourseId">
+                                        <option value="">Select a Course Code</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(a => a.RoomId)
+                                    @Html.DropDownListFor(a => a.RoomId, new SelectList(ViewBag.Room, "RoomID", "RoomNo"), "Select a Room", new {@class = "form-control input-sm"})
+                                </div>
+                            </div>
+
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(a => a.DayId)
+                                    @Html.DropDownListFor(a => a.DayId, new SelectList(ViewBag.Day, "DayId", "DayName"), "Select a Day", new { @class = "form-control input-sm"})
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TimeFrom)
+                                    <div class="input-group bootstrap-timepicker timepicker">
+                                        <input id="TimeFrom" type="text" class="form-control input-small time" name="TimeFrom" readonly>
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(model => model.TimeTo)
+                                    <div class="input-group bootstrap-timepicker timepicker">
+                                        <input id="TimeTo" type="text" class="form-control input-small time" name="TimeTo" readonly>
+                                        <span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span>
+                                    </div>
+
+                                </div>
+                            </div>
+                                <div class="box-footer">
+                                    <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+
+                                </div>
+                            </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+
+<script>
+    $(document).ready(function() {
+        $("#DepartmentId").change(function() {
+            var deptId = $("#DepartmentId").val();
+            $("#CourseId").empty();
+            $("#CourseId").append('<option value>Select a Course</option>');
+            var json = {
+                departmentId: deptId
+            };
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetCourseByDepartmentId", "AllocateClassroom")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(json),
+                success: function(data) {
+                    //alert(data);
+
+                    $.each(data, function(key, value) {
+                        //alert(key);
+                        $("#CourseId").append('<option value=' + value.Id + '>' + value.Name + '</option>');
+                    });
+                    getCourse();
+                }
+            });
+            //getCourse();
+        });
+
+    });
+
+    $(document).ready(function() {
+        //alert('sdfds');
+        $("#AllocateClassroom").validate({
+            rules: {
+                DepartmentId: "required",
+                CourseId: "required",
+                RoomId: "required",
+                DayId: "required"
+            },
+            messages: {
+                DepartmentId: "Please select a Department",
+                CourseId: "Please select a Course",
+                RoomId: "Please select a Room",
+                DayId: "Please select a Day"
+            }
+        });
+    });
+</script>
+
+

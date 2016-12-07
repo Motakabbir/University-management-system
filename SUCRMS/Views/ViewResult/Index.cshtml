@@ -1,0 +1,218 @@
+﻿@using SUCRMS.Models
+@model SUCRMS.Models.SaveStudentResult
+@{
+    ViewBag.Title = "Save";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        View Result
+
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i>View Result</a></li>
+
+    </ol>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box box-primary col-sm-12">
+                <div class="col-sm-8 col-sm-offset-2">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">View Result</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    @using (Html.BeginForm("Save", "SaveStudentResult", FormMethod.Post, new { @class = "form-horizontal", @id = "SaveStudentResult" }))
+                    {
+
+
+
+                        @Html.ValidationSummary(true)
+                        <div class="box-body">
+                            <div class="form-group">
+                                @Html.LabelFor(a => a.StudentId, new { @class = "col-sm-3" })
+                                <div class="col-sm-9">
+                                    @Html.DropDownListFor(a => a.StudentId, new SelectList(ViewBag.Student, "Id", "RegistrationId"), "Select a Reg No", new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.StudentId)
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="Name" class="col-sm-3">Name</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control input-sm" name="Name" id="Name" readonly="" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="Email" class="col-sm-3">Email</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control input-sm" name="Email" id="Email" readonly="" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="dptid" class="col-sm-3">Department</label>
+                                <div class="col-sm-9">
+                                    <input class="form-control input-sm" name="Department" id="dptid" readonly="" />
+                                </div>
+                            </div>
+
+                            <div class="box-footer text-right">
+                                <button type="button" class="btn btn-primary btn-sm" onclick="generatePDF();">Make PDF</button>
+                            </div>
+                        </div>
+                    }
+                    <table class="table table-bordered table-condensed " id="table">
+                       
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    var studentnumber = null;
+    $(document).ready(function() {
+        var departmentids = null;
+        
+        $("#StudentId").change(function() {
+            var StudenId = $("#StudentId").val();
+            $("#Name").val("");
+            $("#Email").val("");
+            $("#dptid").val("");
+            $("#CourseId").empty();
+            var json = {
+                StudenId: StudenId
+            };
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetNameByRegNo", "SaveStudentResult")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(json),
+                success: function(data) {
+                    //alert(data);
+                    $.each(data, function(key, value) {
+                        //alert(key);
+                        $("#Name").val(value.Name);
+                        $("#Email").val(value.Email);
+                        departmentids = value.DepartmentId;
+                        studentnumber = value.RegistrationId;
+                        //alert(departmentids);
+                    });
+                    getdepartment();
+                }
+            });
+            //getCourse();
+        });
+
+        function getdepartment() {
+            // alert("in");
+            var deptId = departmentids;
+
+            $("#dptid").val("");
+            var json = {
+                departmentId: deptId
+            };
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetdepartmentByRegNo", "SaveStudentResult")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(json),
+                success: function(data1) {
+                    $.each(data1, function(key, value) {
+                        if (value == "") {
+
+                        } else {
+                            $("#dptid").val(value.Code);
+                        }
+                    });
+                    viewResult();
+                }
+
+            });
+
+        }
+
+        function viewResult() {
+            //alert("in");
+
+            var studenId = $("#StudentId").val();
+            // alert("Your Selected Registration Number: " + studentnumber);
+
+            var json = {
+                studenId: studenId
+            };
+
+            $("#table").empty();
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetResultByStudentId", "ViewResult")',
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify(json),
+                success: function(data) {
+
+                    //$("#CourseId").append("<option value=''>Select a Course Code</option>");
+                    $("#table").append('<thead> <tr> <th>Course Code</th> <th>Name</th> <th>Grade</th> </tr> </thead> <tbody>');
+                    $.each(data, function(key, value) {
+                        if (value.Grade != "") {
+                            $("#table").append('<tr> <td>' + value.CourseCode + '</td> <td>' + value.CourseName + '</td> <td>' + value.Grade + '</td> </tr>');
+                        } else {
+                            $("#table").append('<tr> <td>' + value.CourseCode + '</td> <td>' + value.CourseName + '</td> <td> Not Graded Yet </td> </tr>');
+                        }
+                    });
+                    $("#table").append('</tbody>');
+                }
+            });
+        }
+   
+    });
+    function generatePDF() {
+       
+        var pdfsize = 'a4';
+        var pdfname = "Result";
+        var pdf = new jsPDF('l', 'pt', pdfsize);
+
+        var res = pdf.autoTableHtmlToJson(document.getElementById("table"));
+
+        var header = function (data) {
+            pdf.setFontSize(18);
+            pdf.setTextColor(40);
+            pdf.setFontStyle('normal');
+            //doc.addImage(headerImgData, 'JPEG', data.settings.margin.left, 20, 50, 50);
+            pdf.text("Student Result. Registration Id :" + studentnumber, data.settings.margin.left, 50);
+        }
+
+        pdf.autoTable(res.columns, res.data, {
+            theme: 'grid',
+            beforePageContent: header,
+            startY: 60,
+
+            margin: {
+                top: 60
+            },
+            styles: {
+                overflow: 'linebreak',
+                fontSize: 10,
+                tableWidth: 'auto',
+                columnWidth: 'auto',
+            },
+            columnStyles: {
+                1: {
+                    columnWidth: 'auto'
+                }
+            },
+
+
+        });
+
+
+        pdf.save(pdfname + ".pdf");
+    };
+
+</script> 
+
+

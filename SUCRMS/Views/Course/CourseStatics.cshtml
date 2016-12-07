@@ -1,0 +1,86 @@
+﻿@using SUCRMS.Models
+@model SUCRMS.Models.Course
+@{
+    ViewBag.Title = "View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    List<Course> courses = ViewBag.CourseList;
+}
+
+<section class="content-header">
+    <h1>
+        Course Statics
+        <small>View</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Course Statics</a></li>
+        <li class="active">View</li>
+    </ol>
+</section>
+
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box box-primary col-sm-12">
+                <div class="box-header with-border">
+                    <div class="col-sm-6">
+                        <h3 class="box-title" style="">Course Information</h3>   
+                    </div>
+                    <div class="col-sm-6">
+                        <form class="form-horizontal" action="CourseStatics" method="POST">
+                            <div class="form-group">
+                                @Html.LabelFor(a => a.DepartmentId, new { @class = "col-sm-3 control-label" })
+                                <div class="col-sm-9">
+                                    @Html.DropDownListFor(a => a.DepartmentId, new SelectList(ViewBag.Department, "Id", "Code"), "Select a Department", new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.DepartmentId)
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <table border="1" class="table table-bordered table-condensed" id="view">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Name/Title</th>
+                                <th>Semester</th>
+                                <th>Assigned To</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (courses != null)
+                            {
+
+                                foreach (Course course in courses)
+                                {
+                                    <tr>
+
+                                        <td>@course.Code</td>
+                                        <td>@course.Name</td>
+                                        <td>@course.Semester</td>
+                                        <td>@course.TeacherName</td>
+                                    </tr>
+
+                                }
+                            }
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="~/Scripts/DataTables/jquery.dataTables.min.js"></script>
+<script src="~/Scripts/DataTables/responsive.bootstrap.min.js"></script>
+<script>
+    $(document).ready(function () {
+
+        $('#view').DataTable();
+
+        $("#DepartmentId").change(function () {
+            this.form.submit();
+        });
+
+    });
+</script>

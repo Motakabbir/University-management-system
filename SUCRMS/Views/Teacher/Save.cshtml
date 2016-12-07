@@ -1,0 +1,144 @@
+﻿@using SUCRMS.Models
+@model SUCRMS.Models.Teacher
+@{
+    ViewBag.Title = "Save";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<section class="content-header">
+    <h1>
+        Teacher
+        <small>Save</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li><a href="#"><i class="fa fa-dashboard"></i> Teacher</a></li>
+        <li class="active">Save</li>
+    </ol>
+</section>
+<section class="content">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box box-primary col-sm-12">
+                <div class="col-sm-8 col-sm-offset-2">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">Add Teacher</h3>
+                    </div>
+                    <!-- /.box-header -->
+                    <!-- form start -->
+                    @using (Html.BeginForm("Save", "Teacher", FormMethod.Post, new { @class = "form-horizontal", @id = "teacher" }))
+                    {
+
+                        if (ViewBag.Message != null)
+                        {
+                            if (ViewBag.Message == "Saved")
+                            {
+                                <div class="col-sm-12"></div>
+                                <div class="alert alert-success" id="success-alert">
+                                    <button type="button" class="close" data-dismiss="alert">x</button>
+                                    <strong>Successfully saved! </strong>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-sm-12">
+                                    <div class="alert alert-error" id="success-alert">
+                                        <button type="button" class="close" data-dismiss="alert">x</button>
+                                        <strong>Faild save! </strong>
+                                        <p>@ViewBag.Message</p>
+                                    </div>
+                                </div>
+                            }
+
+                        }
+                        @Html.ValidationSummary(true)
+                        <div class="box-body">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+
+                                    @Html.LabelFor(a => a.Name)
+                                    @Html.TextBoxFor(a => a.Name, new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.Name)
+                                </div>
+
+                                <div class="form-group">
+
+                                    @Html.LabelFor(a => a.Address)
+                                    @Html.TextAreaFor(a => a.Address, new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.Address)
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(a => a.Email)
+                                    @Html.TextBoxFor(a => a.Email, new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.Email)
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(a => a.ContactNo)
+                                    @Html.TextBoxFor(a => a.ContactNo, new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.ContactNo)
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(a => a.DesignationId)
+                                    @Html.DropDownListFor(a => a.DesignationId, new SelectList(ViewBag.Designation, "Id", "Name"), new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.DesignationId)
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(a => a.DepartmentId)
+                                    @Html.DropDownListFor(a => a.DepartmentId, new SelectList(ViewBag.Department, "Id", "Code"), new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.DepartmentId)
+                                </div>
+                                <div class="form-group">
+                                    @Html.LabelFor(a => a.CreditTobeTaken)
+                                    @Html.TextBoxFor(a => a.CreditTobeTaken, new { @class = "form-control input-sm" })
+                                    @Html.ValidationMessageFor(m => m.CreditTobeTaken)
+                                </div>
+                                <!-- /.box-body -->
+                            </div>
+
+                            <div class="box-footer">
+                                <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+<script>
+
+    $(document).ready(function () {
+        //alert('sdfds');
+        $("#teacher").validate({
+            rules: {
+                Name: "required",
+                Address: "required",
+                Email: {
+                    required: true,
+                    email: true
+                },
+                CreditTobeTaken: {
+                    required: true,
+                    min: 1
+                }
+            },
+            messages: {
+                Name: "Please Provide Course Name",
+                Address: "Please Provide Course Name",
+                Email: "Please Provide Course Name",
+                CreditTobeTaken: {
+                    required: "Please possitive Credit number!"
+                }
+                
+            }
+        });
+    });
+</script>
+
+
+
+
+
